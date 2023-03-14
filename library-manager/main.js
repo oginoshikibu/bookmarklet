@@ -21,6 +21,19 @@ javascript: (function () {
 		z-index:9998;
 		-moz-border-radius:5px;`;
 
+		panel.appendChild(close_button = document.createElement(`div`));
+		close_button.title = `close button`;
+		close_button.style.cssText = `
+			background: #fff;
+			border: #444 solid 1px;
+			color: #000000;
+			position: absolute;
+			height: 20px;
+			width: 20px;
+			cursor: pointer;
+			text-align:center`;
+		close_button.innerText=`X`
+
 		panel.appendChild(header = document.createElement(`div`));
 		header.innerHTML = panel_id;
 		header.style.cssText = ` padding:0px 10px;
@@ -49,17 +62,6 @@ javascript: (function () {
 			color: #eee;
 			fontSize: 11px;
 			cursor: auto;`;
-
-		panel.appendChild(close_button = document.createElement(`div`));
-		close_button.title = `close button`;
-		close_button.style.cssText = `
-			border: #444 solid 1px;
-			position: absolute;
-			top: 5px";
-			left: 5px";
-			height: 10px;
-			width: 10px;
-			cursor: pointer;`;
 
 		close_button.onclick = function () {
 			body.removeChild(this.parentNode);
