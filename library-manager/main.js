@@ -188,7 +188,7 @@ javascript: (function () {
 			info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, ``).replace(`日`, `年`));
 			var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName(`li`);
 			for (idx = 0; idx < categories_elms.length; idx++) {
-				info.push(`カテゴリ:` + categories_elms[idx].innerText.replace(/^.*位/, ``));
+				info.push(`カテゴリ:` + categories_elms[idx].innerText.replace(/^.*位|\s+/g, ``));
 			}
 
 			var tags = tags_input.value.split(/\s+/);
@@ -199,7 +199,7 @@ javascript: (function () {
 			if (document.getElementsByClassName(`a-icon-alt`)) { lines += ` #` + document.getElementsByClassName(`a-icon-alt`)[0].innerHTML.replace(`5つ星のうち`, `Amazon星`) };
 			if (info) { lines += ` #` + info.join(` #`) };
 			if (tags_input.value) { lines += `\n#` + tags.join(` #`) };
-			if (document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)) { lines += `\n\n\n[/icons/hr.icon]` + document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)[0].innerText };
+			if (document.getElementsByClassName(`a-expander-content a-expander-partial-collapse-content`)) { lines += `\n\n\n[/icons/hr.icon]` + document.getElementsByClassName(`a-expander-content a-expander-partial-collapse-content`)[0].innerText };
 
 			var body = encodeURIComponent(lines);
 			window.open(`https://scrapbox.io/oginos-reading-record/` + encodeURIComponent(title.trim()) + `?body=` + body);
