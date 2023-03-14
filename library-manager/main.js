@@ -94,32 +94,76 @@ javascript: (function () {
 	}
 
 
-	var panel = createPanel(`hoge`, 200);
-	panel.header.innerHTML = `検索パネル`;
+	var panel = createPanel(`蔵書管理パネル`, 300);
+	panel.header.innerHTML = `蔵書管理パネル`;
 	var content = panel.content, tags_input, sbm_button;
 	content.appendChild(tags_input = document.createElement(`input`));
 	tags_input.style.cssText = ` display:block;
 	width:90%;
-	margin:6px;
+	margin:10px;
 	border:1px solid #666;
 	background:transparent;
 	color:inherit;
 	font-weight:bold;
 	font-size:13px;`;
+	tags_input.focus();
 
+	function generateRadioButtons(arr, id, name) {
+		var form = document.createElement('form');
+		form.id = `form${id}`
+		form.style.cssText = `display:flex;
+							  align-items:center;
+							  margin:10px 3px 0px 3px;
+							  `;
+		arr.forEach((value, index) => {
+			var label = document.createElement('label');
+			label.style.cssText = `width:25%;`;
+			var radio = document.createElement('input');
+			radio.type = 'radio';
+			radio.name = name;
+			radio.value = value;
+			radio.style.cssText = `margin-right:3px;`;
+			label.appendChild(radio);
+			label.appendChild(document.createTextNode(value));
+			form.appendChild(label);
+			if (index === 0) { radio.checked = true; }
+		});
+		return form;
+	}
+
+
+	content.appendChild(form1 = generateRadioButtons([`気になる`, `欲しい`, `家`, `実家`], 1, `所在地`));
+	content.appendChild(form2 = generateRadioButtons([`未読`, `チラ見`, `読む`, `読んだ`], 2, `状態`));
+
+
+
+	function getRadioSelectedValue(name) {
+		let radios = document.getElementsByName(name);
+		let selectedValue;
+
+		for (let i = 0; i < radios.length; i++) {
+			if (radios[i].checked) {
+				selectedValue = radios[i].value;
+				break;
+			}
+		}
+
+		return selectedValue;
+	}
 
 	content.appendChild(sbm_button = document.createElement(`button`));
 	with (sbm_button) {
 		innerHTML = `Scrapbox へ保存`;
 		style.cssText = ` cursor:pointer;
-		margin:6px auto;
+		margin:8px auto;
 		display:block;
 		clear:both;`;
 		onclick = function () {
-			try{			
+			try {
+
 				var title_elm = document.getElementById("productTitle");
 				if (!title_elm) var title_elm = document.getElementById("ebooksProductTitle");
-				var title = window.prompt(`Scrap "Amazon" to your scrapbox.`, title_elm.innerHTML);
+				var title = title_elm.innerHTML;
 				if (!title) return;
 
 				var images_elm = document.getElementById("imageBlockContainer");
@@ -131,16 +175,35 @@ javascript: (function () {
 				var pub = [];
 				var authors_elm = document.getElementsByClassName(`author`);
 				for (g = 0; g < authors_elm.length; g++) {
-					let at = authors_elm[g].innerText.replace(/,/, ``);
+					let at = authors_elm[g].innerText.replace(/\s+/g, ``);
 					let pu = at.match(/\(.+\)/);
-					let ct = at.replace(/\(.+\)/, ``).replace(/ /g, ``);
-					pub.push(pu + ` [` + ct + `]`);
+					let ct = at.replace(/\(.+\)/, ``);
+					pub.push(`[` + ct + `]` + pu);
 				}
 
-				var lines = `[` + image_url + ` ` + window.location.href + `]\n` + pub.join(` `) + `\n#本`;
+				var info = [];
+				var infos_elms = document.getElementsByClassName(`a-unordered-list a-nostyle a-vertical a-spacing-none detail-bullet-list`);
+				var about_li = infos_elms[0].getElementsByTagName("li");
+				info.push(about_li[0].innerText.replace(/\s+|\(.+\)|&rlim;/g, ``));
+				info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, ``).replace(`日`, `年`));
+				var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName(`li`);
+				for (idx=0;idx<categories_elms.length;idx++){
+					info.push(`カテゴリ:`+categories_elms[idx].innerText.replace(/^.*位/, ``));
+				}
+
+				var tags = tags_input.value.split(/\s+/);
+
+				var lines = `[` + image_url + ` ` + window.location.href + `]\n`
+					+ pub.join(` `)
+					+ `\n#${getRadioSelectedValue(`所在地`)} #${getRadioSelectedValue(`状態`)}`;
+				if (document.getElementsByClassName(`a-icon-alt`)) { lines += ` #` + document.getElementsByClassName(`a-icon-alt`)[0].innerHTML.replace(`5つ星のうち`, `Amazon星`) };
+				if (info){lines+=` #`+info.join(` #`)};
+				if (tags_input.value) { lines += `\n#` + tags.join(` #`) };
+				if (document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)) { lines += `\n\n\n[/icons/hr.icon]` + document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)[0].innerText };
+
 				var body = encodeURIComponent(lines);
-				window.open(`https://scrapbox.io/oginos-reading-record/` + encodeURIComponent(title.trim()) + `?body=` + body)
-			} catch (error){
+				window.open(`https://scrapbox.io/oginos-reading-record/` + encodeURIComponent(title.trim()) + `?body=` + body);
+			} catch (error) {
 				alert(error);
 			}
 		}
