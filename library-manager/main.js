@@ -42,26 +42,25 @@ javascript: (function () {
 
 		panel.appendChild(frame = document.createElement(`div`));
 		frame.id = `frame`;
-		with (frame.style) {
-			height = panel_height - 20 + `px`;
-			overflow = `auto`;
-			backgroundColor = `#222`;
-			color = `#eee`;
-			fontSize = `11px`;
-			cursor = `auto`;
-		}
+		frame.style.cssText = `
+			height: ${panel_height - 20}px;
+			overflow: auto;
+			backgroundColor: #222;
+			color: #eee;
+			fontSize: 11px;
+			cursor: auto;`;
 
 		panel.appendChild(close_button = document.createElement(`div`));
 		close_button.title = `close button`;
-		with (close_button.style) {
-			border = `#444 solid 1px`;
-			position = `absolute`;
-			top = "5px";
-			left = "5px";
-			height = `10px`;
-			width = `10px`;
-			cursor = `pointer`;
-		}
+		close_button.style.cssText = `
+			border: #444 solid 1px;
+			position: absolute;
+			top: 5px";
+			left: 5px";
+			height: 10px;
+			width: 10px;
+			cursor: pointer;`;
+
 		close_button.onclick = function () {
 			body.removeChild(this.parentNode);
 		}
@@ -152,61 +151,58 @@ javascript: (function () {
 	}
 
 	content.appendChild(sbm_button = document.createElement(`button`));
-	with (sbm_button) {
-		innerHTML = `Scrapbox へ保存`;
-		style.cssText = ` cursor:pointer;
-		margin:8px auto;
-		display:block;
-		clear:both;`;
-		onclick = function () {
-			try {
+	sbm_button.innerHTML = `Scrapbox へ保存`;
+	sbm_button.style.cssText = ` cursor:pointer;
+	margin:8px auto;
+	display:block;
+	clear:both;`;
+	sbm_button.onclick = function () {
+		try {
 
-				var title_elm = document.getElementById("productTitle");
-				if (!title_elm) var title_elm = document.getElementById("ebooksProductTitle");
-				var title = title_elm.innerHTML;
-				if (!title) return;
+			var title_elm = document.getElementById("productTitle");
+			if (!title_elm) var title_elm = document.getElementById("ebooksProductTitle");
+			var title = title_elm.innerHTML;
+			if (!title) return;
 
-				var images_elm = document.getElementById("imageBlockContainer");
-				if (!images_elm) var images_elm = document.getElementById("ebooksImageBlockContainer");
-				var images = images_elm.getElementsByTagName("img");
-				var image = images[images.length - 1];
-				var image_url = image.getAttribute("src");
+			var images_elm = document.getElementById("imageBlockContainer");
+			if (!images_elm) var images_elm = document.getElementById("ebooksImageBlockContainer");
+			var images = images_elm.getElementsByTagName("img");
+			var image = images[images.length - 1];
+			var image_url = image.getAttribute("src");
 
-				var pub = [];
-				var authors_elm = document.getElementsByClassName(`author`);
-				for (g = 0; g < authors_elm.length; g++) {
-					let at = authors_elm[g].innerText.replace(/\s+/g, ``);
-					let pu = at.match(/\(.+\)/);
-					let ct = at.replace(/\(.+\)/, ``);
-					pub.push(`[` + ct + `]` + pu);
-				}
-
-				var info = [];
-				var infos_elms = document.getElementsByClassName(`a-unordered-list a-nostyle a-vertical a-spacing-none detail-bullet-list`);
-				var about_li = infos_elms[0].getElementsByTagName("li");
-				info.push(about_li[0].innerText.replace(/\s+|\(.+\)|&rlim;/g, ``));
-				info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, ``).replace(`日`, `年`));
-				var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName(`li`);
-				for (idx=0;idx<categories_elms.length;idx++){
-					info.push(`カテゴリ:`+categories_elms[idx].innerText.replace(/^.*位/, ``));
-				}
-
-				var tags = tags_input.value.split(/\s+/);
-
-				var lines = `[` + image_url + ` ` + window.location.href + `]\n`
-					+ pub.join(` `)
-					+ `\n#${getRadioSelectedValue(`所在地`)} #${getRadioSelectedValue(`状態`)}`;
-				if (document.getElementsByClassName(`a-icon-alt`)) { lines += ` #` + document.getElementsByClassName(`a-icon-alt`)[0].innerHTML.replace(`5つ星のうち`, `Amazon星`) };
-				if (info){lines+=` #`+info.join(` #`)};
-				if (tags_input.value) { lines += `\n#` + tags.join(` #`) };
-				if (document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)) { lines += `\n\n\n[/icons/hr.icon]` + document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)[0].innerText };
-
-				var body = encodeURIComponent(lines);
-				window.open(`https://scrapbox.io/oginos-reading-record/` + encodeURIComponent(title.trim()) + `?body=` + body);
-			} catch (error) {
-				alert(error);
+			var pub = [];
+			var authors_elm = document.getElementsByClassName(`author`);
+			for (g = 0; g < authors_elm.length; g++) {
+				let at = authors_elm[g].innerText.replace(/\s+/g, ``);
+				let pu = at.match(/\(.+\)/);
+				let ct = at.replace(/\(.+\)/, ``);
+				pub.push(`[` + ct + `]` + pu);
 			}
+
+			var info = [];
+			var infos_elms = document.getElementsByClassName(`a-unordered-list a-nostyle a-vertical a-spacing-none detail-bullet-list`);
+			var about_li = infos_elms[0].getElementsByTagName("li");
+			info.push(about_li[0].innerText.replace(/\s+|\(.+\)|&rlim;/g, ``));
+			info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, ``).replace(`日`, `年`));
+			var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName(`li`);
+			for (idx = 0; idx < categories_elms.length; idx++) {
+				info.push(`カテゴリ:` + categories_elms[idx].innerText.replace(/^.*位/, ``));
+			}
+
+			var tags = tags_input.value.split(/\s+/);
+
+			var lines = `[` + image_url + ` ` + window.location.href + `]\n`
+				+ pub.join(` `)
+				+ `\n#${getRadioSelectedValue(`所在地`)} #${getRadioSelectedValue(`状態`)}`;
+			if (document.getElementsByClassName(`a-icon-alt`)) { lines += ` #` + document.getElementsByClassName(`a-icon-alt`)[0].innerHTML.replace(`5つ星のうち`, `Amazon星`) };
+			if (info) { lines += ` #` + info.join(` #`) };
+			if (tags_input.value) { lines += `\n#` + tags.join(` #`) };
+			if (document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)) { lines += `\n\n\n[/icons/hr.icon]` + document.getElementsByClassName(`a-section a-spacing-small a-padding-small`)[0].innerText };
+
+			var body = encodeURIComponent(lines);
+			window.open(`https://scrapbox.io/oginos-reading-record/` + encodeURIComponent(title.trim()) + `?body=` + body);
+		} catch (error) {
+			alert(error);
 		}
 	}
-}
-)()
+})()
