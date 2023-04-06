@@ -24,6 +24,7 @@ javascript: (function () {
 		z-index:9998;
 		-moz-border-radius:5px;`;
 
+
 		panel.appendChild(close_button = document.createElement("div"));
 		close_button.title = "close button";
 		close_button.style.cssText = `
@@ -35,8 +36,7 @@ javascript: (function () {
 			border: #444 solid 1px;
 			color: #000000;
 			cursor: pointer;
-			font-size: 14px;
-			line-height: 1;`;
+			text-align:center`;
 		close_button.innerText = "X"
 
 		panel.appendChild(header = document.createElement("div"));
@@ -49,8 +49,9 @@ javascript: (function () {
 		font-weight:bold;
 		text-align:center;
 		cursor:move;`;
-		
-		//Q: display_panelの存在意義が不明だが、これがないと動かない
+
+    //Q: display_panelの存在意義が不明だが、これがないと動かない
+
 		display_panel = document.createElement("div");
 		display_panel.style.cssText = `background:transparent;
 		position:fixed;
