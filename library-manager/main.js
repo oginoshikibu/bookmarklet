@@ -1,16 +1,19 @@
 javascript: (function () {
-	var body = document.getElementsByTagName(`body`)[0];
-	function createPanel(panel_id, panel_width, panel_height) {
-		var panel, frame, header, display_panel, close_button;/*Q: display_panelの存在意義が不明*/
+	var body = document.getElementsByTagName("body")[0];
 
-		body.appendChild(panel = document.createElement(`div`));
+	// ここはhttp://bookmarklet.web.fc2.com/bookmarklet_097.htmlから引っ張ってきただけで、ちゃんと理解していない
+	function createPanel(panel_id, panel_width, panel_height) {
+		var panel, frame, header, display_panel, close_button;
+
+		body.appendChild(panel = document.createElement("div"));
 		panel.id = panel_id;
-		panel.style.cssText = ` position:fixed;
+		panel.style.cssText = `
+		position:fixed;
 		top:10px;
 		left:10px;
 		padding:2px;
-		width:`+ panel_width + `px;
-		height:`+ panel_height + `px;
+		width:${panel_width}px;
+		height:${panel_height}px;
 		opacity:0.8;
 		filter:alpha(opacity = 95);
 		background:#000;
@@ -21,20 +24,22 @@ javascript: (function () {
 		z-index:9998;
 		-moz-border-radius:5px;`;
 
-		panel.appendChild(close_button = document.createElement(`div`));
-		close_button.title = `close button`;
+		panel.appendChild(close_button = document.createElement("div"));
+		close_button.title = "close button";
 		close_button.style.cssText = `
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 3px 6px 3px 6px;
 			background: #fff;
 			border: #444 solid 1px;
 			color: #000000;
-			position: absolute;
-			height: 20px;
-			width: 20px;
 			cursor: pointer;
-			text-align:center`;
-		close_button.innerText=`X`
+			font-size: 14px;
+			line-height: 1;`;
+		close_button.innerText = "X"
 
-		panel.appendChild(header = document.createElement(`div`));
+		panel.appendChild(header = document.createElement("div"));
 		header.innerHTML = panel_id;
 		header.style.cssText = ` padding:0px 10px;
 		height:20px;
@@ -44,8 +49,9 @@ javascript: (function () {
 		font-weight:bold;
 		text-align:center;
 		cursor:move;`;
-
-		display_panel = document.createElement(`div`);
+		
+		//Q: display_panelの存在意義が不明だが、これがないと動かない
+		display_panel = document.createElement("div");
 		display_panel.style.cssText = `background:transparent;
 		position:fixed;
 		top:0px;
@@ -53,8 +59,8 @@ javascript: (function () {
 		width:100%;
 		height:100%;`;
 
-		panel.appendChild(frame = document.createElement(`div`));
-		frame.id = `frame`;
+		panel.appendChild(frame = document.createElement("div"));
+		frame.id = "frame";
 		frame.style.cssText = `
 			height: ${panel_height - 20}px;
 			overflow: auto;
@@ -79,8 +85,8 @@ javascript: (function () {
 		display_panel.onmousemove = function (e) {
 			x = (e) ? e.pageX : event.x;
 			y = (e) ? e.pageY : event.y;
-			panel.style.left = (x - ox) + `px`;
-			panel.style.top = (y - oy) + `px`;
+			panel.style.left = (x - ox) + "px";
+			panel.style.top = (y - oy) + "px";
 			return false;
 		}
 			;
@@ -95,10 +101,11 @@ javascript: (function () {
 	}
 
 
-	var panel = createPanel(`蔵書管理パネル`, 300);
-	panel.header.innerHTML = `蔵書管理パネル`;
+	var panel = createPanel("蔵書管理パネル", 300);
+	panel.header.innerHTML = "蔵書管理パネル";
 	var content = panel.content, tags_input, sbm_button;
-	content.appendChild(tags_input = document.createElement(`input`));
+	//tag入力フォーム
+	content.appendChild(tags_input = document.createElement("input"));
 	tags_input.style.cssText = ` display:block;
 	width:90%;
 	margin:10px;
@@ -110,20 +117,20 @@ javascript: (function () {
 	tags_input.focus();
 
 	function generateRadioButtons(arr, id, name) {
-		var form = document.createElement('form');
+		var form = document.createElement("form");
 		form.id = `form${id}`
 		form.style.cssText = `display:flex;
 							  align-items:center;
 							  margin:10px 3px 0px 3px;
 							  `;
 		arr.forEach((value, index) => {
-			var label = document.createElement('label');
-			label.style.cssText = `width:25%;`;
-			var radio = document.createElement('input');
-			radio.type = 'radio';
+			var label = document.createElement("label");
+			label.style.cssText = "width:25%;";
+			var radio = document.createElement("input");
+			radio.type = "radio";
 			radio.name = name;
 			radio.value = value;
-			radio.style.cssText = `margin-right:3px;`;
+			radio.style.cssText = "margin-right:3px;";
 			label.appendChild(radio);
 			label.appendChild(document.createTextNode(value));
 			form.appendChild(label);
@@ -132,78 +139,80 @@ javascript: (function () {
 		return form;
 	}
 
-
-	content.appendChild(form1 = generateRadioButtons([`気になる`, `欲しい`, `家`, `実家`], 1, `所在地`));
-	content.appendChild(form2 = generateRadioButtons([`未読`, `チラ見`, `読む`, `読んだ`], 2, `状態`));
-
-
-
 	function getRadioSelectedValue(name) {
 		let radios = document.getElementsByName(name);
 		let selectedValue;
-
 		for (let i = 0; i < radios.length; i++) {
-			if (radios[i].checked) {
-				selectedValue = radios[i].value;
-				break;
-			}
+			if (radios[i].checked) { selectedValue = radios[i].value; break; }
 		}
-
 		return selectedValue;
 	}
 
-	content.appendChild(sbm_button = document.createElement(`button`));
-	sbm_button.innerHTML = `Scrapbox へ保存`;
+	// ラジオボタンでタグを強制的に追加（配列のものを選択してそれをタグへ）
+	content.appendChild(form1 = generateRadioButtons(["気になる", "欲しい", "家", "実家"], 1, "所在地"));
+	content.appendChild(form2 = generateRadioButtons(["未読", "チラ見", "読む", "読んだ"], 2, "状態"));
+
+	//送信ボタン
+	content.appendChild(sbm_button = document.createElement("button"));
+	sbm_button.innerHTML = "Scrapbox へ保存";
 	sbm_button.style.cssText = ` cursor:pointer;
 	margin:8px auto;
 	display:block;
 	clear:both;`;
 	sbm_button.onclick = function () {
 		try {
-
+			//タイトル
 			var title_elm = document.getElementById("productTitle");
 			if (!title_elm) var title_elm = document.getElementById("ebooksProductTitle");
 			var title = title_elm.innerHTML;
 			if (!title) return;
-
+			//表紙画像
 			var images_elm = document.getElementById("imageBlockContainer");
 			if (!images_elm) var images_elm = document.getElementById("ebooksImageBlockContainer");
 			var images = images_elm.getElementsByTagName("img");
 			var image = images[images.length - 1];
 			var image_url = image.getAttribute("src");
-
+			//著者
 			var pub = [];
-			var authors_elm = document.getElementsByClassName(`author`);
+			var authors_elm = document.getElementsByClassName("author");
 			for (g = 0; g < authors_elm.length; g++) {
-				let at = authors_elm[g].innerText.replace(/\s+/g, ``);
+				let at = authors_elm[g].innerText.replace(/\s+/g, "");
 				let pu = at.match(/\(.+\)/);
-				let ct = at.replace(/\(.+\)/, ``);
-				pub.push(`[` + ct + `]` + pu);
+				let ct = at.replace(/\(.+\)/, "");
+				pub.push("[" + ct + "]" + pu);
 			}
-
+			//info:出版社、発売年、ランキングのカテゴリ 
 			var info = [];
-			var infos_elms = document.getElementsByClassName(`a-unordered-list a-nostyle a-vertical a-spacing-none detail-bullet-list`);
+			var infos_elms = document.getElementsByClassName("a-unordered-list a-nostyle a-vertical a-spacing-none detail-bullet-list");
 			var about_li = infos_elms[0].getElementsByTagName("li");
-			info.push(about_li[0].innerText.replace(/\s+|\(.+\)|&rlim;/g, ``));
-			info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, ``).replace(`日`, `年`));
-			var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName(`li`);
-			for (idx = 0; idx < categories_elms.length; idx++) {
-				info.push(`カテゴリ:` + categories_elms[idx].innerText.replace(/^.*位|\s+/g, ``));
+			for (idx = 0; idx < about_li.length; idx++) {
+				if (about_li[idx].innerText.includes("出版社")) {
+					info.push(about_li[idx].innerText.replace(/\s+|\(.+\)|&rlim;/g, ""));
+				}
+				if (about_li[idx].innerText.includes("発売日")) {
+					info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, "").replace("日", "年"));
+				}
 			}
-
+			var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName("li");
+			for (idx = 0; idx < categories_elms.length; idx++) {
+				info.push("カテゴリ:" + categories_elms[idx].innerText.replace(/^.*位|\s+/g, ""));
+			}
+			//入力したタグ
 			var tags = tags_input.value.split(/\s+/);
 
-			var lines = `[` + image_url + ` ` + window.location.href + `]\n`
-				+ pub.join(` `)
-				+ `\n#${getRadioSelectedValue(`所在地`)} #${getRadioSelectedValue(`状態`)}`;
-			if (document.getElementsByClassName(`a-icon-alt`)) { lines += ` #` + document.getElementsByClassName(`a-icon-alt`)[0].innerHTML.replace(`5つ星のうち`, `Amazon星`) };
-			if (info) { lines += ` #` + info.join(` #`) };
-			if (tags_input.value) { lines += `\n#` + tags.join(` #`) };
-			if (document.getElementsByClassName(`a-expander-content a-expander-partial-collapse-content`)) { lines += `\n\n\n[/icons/hr.icon]` + document.getElementsByClassName(`a-expander-content a-expander-partial-collapse-content`)[0].innerText };
+			//本文
+			var lines = "[" + image_url + " " + window.location.href + "]\n"
+				+ pub.join(" ")
+				+ "\n#${getRadioSelectedValue('所在地')} #${getRadioSelectedValue('状態')}";
+			if (document.getElementsByClassName("a-icon-alt")) { lines += " #" + document.getElementsByClassName("a-icon-alt")[0].innerHTML.replace("5つ星のうち", "Amazon星") };
+			if (info) { lines += " #" + info.join(" #") };
+			if (tags_input.value) { lines += "\n#" + tags.join(" #") };
+			if (document.getElementsByClassName("a-expander-content a-expander-partial-collapse-content")) { lines += "\n\n\n[/icons/hr.icon]" + document.getElementsByClassName("a-expander-content a-expander-partial-collapse-content")[0].innerText };
 
 			var body = encodeURIComponent(lines);
-			window.open(`https://scrapbox.io/oginos-reading-record/` + encodeURIComponent(title.trim()) + `?body=` + body);
+			window.open("https://scrapbox.io/oginos-reading-record/" + encodeURIComponent(title.trim()) + "?body=" + body);
 		} catch (error) {
+			console.log(error);
 			alert(error);
 		}
 	}
