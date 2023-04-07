@@ -50,7 +50,7 @@ javascript: (function () {
 		text-align:center;
 		cursor:move;`;
 
-    //Q: display_panelの存在意義が不明だが、これがないと動かない
+		//Q: display_panelの存在意義が不明だが、これがないと動かない
 
 		display_panel = document.createElement("div");
 		display_panel.style.cssText = `background:transparent;
@@ -102,8 +102,8 @@ javascript: (function () {
 	}
 
 
-	var panel = createPanel("蔵書管理パネル", 300);
-	panel.header.innerHTML = "蔵書管理パネル";
+	var panel = createPanel("論文管理パネル", 300);
+	panel.header.innerHTML = "論文管理パネル";
 	var content = panel.content, tags_input, sbm_button;
 	//tag入力フォーム
 	content.appendChild(tags_input = document.createElement("input"));
@@ -140,18 +140,15 @@ javascript: (function () {
 		return form;
 	}
 
-	function getRadioSelectedValue(name) {
-		let radios = document.getElementsByName(name);
-		let selectedValue;
-		for (let i = 0; i < radios.length; i++) {
-			if (radios[i].checked) { selectedValue = radios[i].value; break; }
-		}
-		return selectedValue;
+
+	function elem_to_link(elem) {
+		return "[" + elem.innerText.replace(",","") + "]";
 	}
 
-	// ラジオボタンでタグを強制的に追加（配列のものを選択してそれをタグへ）
-	content.appendChild(form1 = generateRadioButtons(["気になる", "欲しい", "家", "実家"], 1, "所在地"));
-	content.appendChild(form2 = generateRadioButtons(["未読", "チラ見", "読む", "読んだ"], 2, "状態"));
+	function elem_to_tag(elem) {
+		return "#" + elem.innerText;
+	}
+
 
 	//送信ボタン
 	content.appendChild(sbm_button = document.createElement("button"));
@@ -163,57 +160,34 @@ javascript: (function () {
 	sbm_button.onclick = function () {
 		try {
 			//タイトル
-			var title_elm = document.getElementById("productTitle");
-			if (!title_elm) var title_elm = document.getElementById("ebooksProductTitle");
-			var title = title_elm.innerHTML;
+			var title = document.getElementsByClassName("hlFld-Title")[1].innerText;
 			if (!title) return;
-			//表紙画像
-			var images_elm = document.getElementById("imageBlockContainer");
-			if (!images_elm) var images_elm = document.getElementById("ebooksImageBlockContainer");
-			var images = images_elm.getElementsByTagName("img");
-			var image = images[images.length - 1];
-			var image_url = image.getAttribute("src");
+			//abstract画像
+			var abst_img_url = document.getElementsByClassName("article_abstract")[0].getElementsByTagName("img")[0].src;
+
 			//著者
-			var pub = [];
-			var authors_elm = document.getElementsByClassName("author");
-			for (g = 0; g < authors_elm.length; g++) {
-				let at = authors_elm[g].innerText.replace(/\s+/g, "");
-				let pu = at.match(/\(.+\)/);
-				let ct = at.replace(/\(.+\)/, "");
-				pub.push("[" + ct + "]" + pu);
-			}
-			//info:出版社、発売年、ランキングのカテゴリ 
-			var info = [];
-			var infos_elms = document.getElementsByClassName("a-unordered-list a-nostyle a-vertical a-spacing-none detail-bullet-list");
-			var about_li = infos_elms[0].getElementsByTagName("li");
-			for (idx = 0; idx < about_li.length; idx++) {
-				if (about_li[idx].innerText.includes("出版社")) {
-					info.push(about_li[idx].innerText.replace(/\s+|\(.+\)|&rlim;/g, ""));
-				}
-				if (about_li[idx].innerText.includes("発売日")) {
-					info.push(about_li[1].innerText.replace(/\s+|\/.*\/.*|&rlim;/g, "").replace("日", "年"));
-				}
-			}
-			var categories_elms = infos_elms[1].childNodes[1].getElementsByTagName("li");
-			for (idx = 0; idx < categories_elms.length; idx++) {
-				info.push("カテゴリ:" + categories_elms[idx].innerText.replace(/^.*位|\s+/g, ""));
-			}
+			var authors = Array.from(document.getElementsByClassName("hlFld-ContribAuthor")).map(elem_to_link);
+
+
+			//subjects
+			if (document.getElementsByClassName("read-more")[0]){throw ("subjects are not shown. please click 'show more' button")}
+			var subjects = Array.from(document.getElementsByClassName("rlist--inline loa")[0].children).map(elem_to_link);
+			if (document.getElementsByClassName("read-less")){subjects.pop()}
+
 			//入力したタグ
-			var tags = tags_input.value.split(/\s+/);
+			var tags = tags_input.value.split(/\s+/).map(elem_to_tag);
 
 			//本文
-			var lines = "[" + image_url + " " + window.location.href + "]\n"
-				+ pub.join(" ")
-				+ "\n#${getRadioSelectedValue('所在地')} #${getRadioSelectedValue('状態')}";
-			if (document.getElementsByClassName("a-icon-alt")) { lines += " #" + document.getElementsByClassName("a-icon-alt")[0].innerHTML.replace("5つ星のうち", "Amazon星") };
-			if (info) { lines += " #" + info.join(" #") };
-			if (tags_input.value) { lines += "\n#" + tags.join(" #") };
-			if (document.getElementsByClassName("a-expander-content a-expander-partial-collapse-content")) { lines += "\n\n\n[/icons/hr.icon]" + document.getElementsByClassName("a-expander-content a-expander-partial-collapse-content")[0].innerText };
+			var lines = "[" + abst_img_url + " " + window.location.href + "]\n"
+				+ authors.join(" ") + "\n"
+				+ subjects.join(" ") + "\n"
+			if (tags_input.value) { lines += tags.join(" ") + "\n" };
+			if (document.getElementsByClassName("articleBody_abstractText")[0]) { lines += "\n\n\n[/icons/hr.icon]\nAbstract\n" + document.getElementsByClassName("articleBody_abstractText")[0].innerText };
 
 			var body = encodeURIComponent(lines);
 			window.open("https://scrapbox.io/oginos-reading-record/" + encodeURIComponent(title.trim()) + "?body=" + body);
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			alert(error);
 		}
 	}
