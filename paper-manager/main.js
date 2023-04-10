@@ -142,7 +142,7 @@ javascript: (function () {
 
 
 	function elem_to_link(elem) {
-		return "[" + elem.innerText.replace(",","") + "]";
+		return "[" + elem.innerText.replace(",", "") + "]";
 	}
 
 	function elem_to_tag(elem) {
@@ -170,22 +170,28 @@ javascript: (function () {
 
 
 			//subjects
-			if (document.getElementsByClassName("read-more")[0]){throw ("subjects are not shown. please click 'show more' button")}
+			if (document.getElementsByClassName("read-more")[0]) { throw ("subjects are not shown. please click 'show more' button") }
 			var subjects = Array.from(document.getElementsByClassName("rlist--inline loa")[0].children).map(elem_to_link);
-			if (document.getElementsByClassName("read-less")){subjects.pop()}
+			if (document.getElementsByClassName("read-less")) { subjects.pop() }
 
 			//入力したタグ
 			var tags = tags_input.value.split(/\s+/).map(elem_to_tag);
+
+			//cite
+			var cite = document.getElementsByClassName("article_header-meta-left pull-left")[0].innerText;
+
 
 			//本文
 			var lines = "[" + abst_img_url + " " + window.location.href + "]\n"
 				+ authors.join(" ") + "\n"
 				+ subjects.join(" ") + "\n"
+				+ cite + "\n";
 			if (tags_input.value) { lines += tags.join(" ") + "\n" };
-			if (document.getElementsByClassName("articleBody_abstractText")[0]) { lines += "\n\n\n[/icons/hr.icon]\nAbstract\n" + document.getElementsByClassName("articleBody_abstractText")[0].innerText };
+
+			lines += "\n\n\n[/icons/hr.icon]\nAbstract\n" + document.getElementsByClassName("articleBody_abstractText")[0].innerText;
 
 			var body = encodeURIComponent(lines);
-			window.open("https://scrapbox.io/oginos-reading-record/" + encodeURIComponent(title.trim()) + "?body=" + body);
+			window.open("https://scrapbox.io/oginos-paper-record/" + encodeURIComponent(title.trim()) + "?body=" + body);
 		} catch (error) {
 			console.error(error);
 			alert(error);
