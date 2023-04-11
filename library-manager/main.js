@@ -202,6 +202,11 @@ javascript: (function () {
 			//入力したタグ
 			var tags = tags_input.value.split(/\s+/);
 
+			//説明
+			var description = document.getElementById("bookDescription_feature_div").getElementsByClassName("a-expander-content a-expander-partial-collapse-content");
+			if (description.length===0&document.getElementById("ebooksDescription_feature_div")) {var description = document.getElementById("ebooksDescription_feature_div").getElementsByClassName("a-expander-content a-expander-partial-collapse-content")};
+			if (description.length===0) {var description = document.getElementsByClassName("a-section a-spacing-small a-padding-small")};
+
 			//本文
 			var lines = "[" + image_url + " " + window.location.href + "]\n"
 				+ pub.join(" ")
@@ -209,8 +214,10 @@ javascript: (function () {
 			if (document.getElementsByClassName("a-icon-alt")) { lines += " #" + document.getElementsByClassName("a-icon-alt")[0].innerHTML.replace("5つ星のうち", "Amazon星") };
 			if (info) { lines += " #" + info.join(" #") };
 			if (tags_input.value) { lines += "\n#" + tags.join(" #") };
-			if (document.getElementsByClassName("a-expander-content a-expander-partial-collapse-content")) { lines += "\n\n\n[/icons/hr.icon]" + document.getElementsByClassName("a-expander-content a-expander-partial-collapse-content")[0].innerText };
+			console.log(description);
+			if (description.length>0) { lines += "\n\n\n[/icons/hr.icon]" + description[0].innerText };
 
+			//Scrapboxへ
 			var body = encodeURIComponent(lines);
 			window.open("https://scrapbox.io/oginos-reading-record/" + encodeURIComponent(title.trim()) + "?body=" + body);
 		} catch (error) {
