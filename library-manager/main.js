@@ -173,13 +173,14 @@ javascript: (function () {
 			var images = images_elm.getElementsByTagName("img");
 			var image = images[images.length - 1];
 			var image_url = image.getAttribute("src");
+
 			//著者
 			var pub = [];
 			var authors_elm = document.getElementsByClassName("author");
 			for (g = 0; g < authors_elm.length; g++) {
 				let at = authors_elm[g].innerText.replace(/\s+/g, "");
 				let pu = at.match(/\(.+\)/);
-				let ct = at.replace(/\(.+\)/, "");
+				let ct = at.replace(/\(.+\)|,/g, "");
 				pub.push("[" + ct + "]" + pu);
 			}
 			//info:出版社、発売年、ランキングのカテゴリ 
@@ -204,7 +205,7 @@ javascript: (function () {
 			//本文
 			var lines = "[" + image_url + " " + window.location.href + "]\n"
 				+ pub.join(" ")
-				+ "\n#${getRadioSelectedValue('所在地')} #${getRadioSelectedValue('状態')}";
+				+ "\n#"+getRadioSelectedValue('所在地')+" #"+getRadioSelectedValue('状態');
 			if (document.getElementsByClassName("a-icon-alt")) { lines += " #" + document.getElementsByClassName("a-icon-alt")[0].innerHTML.replace("5つ星のうち", "Amazon星") };
 			if (info) { lines += " #" + info.join(" #") };
 			if (tags_input.value) { lines += "\n#" + tags.join(" #") };
